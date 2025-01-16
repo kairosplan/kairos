@@ -1,0 +1,27 @@
+@font-face {
+  font-family: "Noto Sans";
+  font-style: normal;
+  font-weight: 100 900; /* Supports the full range of weights */
+  src: url("/fonts/noto-sans.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Noto Sans";
+  font-style: italic;
+  font-weight: 100 900; /* Italic with the full range of weights */
+  src: url("/fonts/noto-sans-italic.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: normal;
+  font-weight: 100 900;
+  src: url("/fonts/source-serif-4.ttf") format("truetype");
+}
+
+@font-face {
+  font-family: "Source Serif 4";
+  font-style: italic;
+  font-weight: 100 900;
+  src: url("/fonts/source-serif-4-italic.ttf") format("truetype");
+}

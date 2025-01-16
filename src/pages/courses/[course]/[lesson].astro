@@ -1,0 +1,96 @@
+---
+// Script imported in the client script tag below
+import "@/modules/lite-youtube-embed/src/lite-yt-embed.css";
+
+import Layout from "@/layouts/Layout.astro";
+import LessonSidebar from "@/components/course/lesson/LessonSidebar.astro";
+import { getCollection } from "astro:content";
+import {
+  getEnrichedCourse,
+  getNextAndPreviousLesson,
+} from "@/utils/courseHelpers";
+import { Icon } from "astro-icon/components";
+import Button from "@/components/common/button/Button.astro";
+import CourseAuthor from "@/components/course/CourseAuthor.astro";
+
+export async function getStaticPaths() {
+  const lessons = await getCollection("lesson");
+  const publishedLessons = lessons.filter(
+    (lesson) => lesson.data.published === true,
+  );
+  const courses = await getCollection("course");
+  return publishedLessons.map((lesson) => {
+    const [courseSlug, lessonSlug] = lesson.slug.split("/");
+    const course = courses.find((course) => course.slug === courseSlug)!;
+    return {
+      params: { course: courseSlug, lesson: lessonSlug },
+      props: { lesson, course },
+    };
+  });
+}
+
+const { course, lesson } = Astro.props;
+const enrichedCourse = await getEnrichedCourse(course.slug);
+const { previousLesson, currentLesson, nextLesson } =
+  await getNextAndPreviousLesson(course.slug, lesson.slug);
+const { Content } = await lesson.render();
+
+const youtubeId = lesson.data.videoUrl?.split("v=")[1];
+---
+
+<Layout title={lesson.data.title} showSidebar mainGray>
+  <LessonSidebar enrichedCourse={enrichedCourse} slot="sidebar" />
+
+  {
+    youtubeId && (
+      <lite-youtube
+        videoid={youtubeId}
+        class="mb-4 max-h-[65vh] w-full min-w-full rounded-2xl bg-gray-300 dark:bg-gray-700"
+        transition:name={`img-${enrichedCourse.slug}`}
+      />
+    )
+  }
+  <div class="px-2">
+    <h1 class="mb-4 font-serif text-4xl font-bold italic md:mb-6">
+      {lesson.data.title}
+    </h1>
+
+    <div class="mb-5 flex items-center justify-between md:mb-8">
+      <CourseAuthor author={currentLesson.author} size="lg" />
+
+      <div class="flex gap-2">
+        {
+          previousLesson && (
+            <Button href={`/courses/${previousLesson.slug}`} color="gray">
+              <span class="hidden md:block">Previous</span>
+              <Icon
+                name="iconoir:arrow-left"
+                class="size-6 cursor-pointer transition-colors hover:text-orange-500 md:hidden"
+              />
+            </Button>
+          )
+        }
+        {
+          nextLesson && (
+            <Button href={`/courses/${nextLesson.slug}`} color="gray">
+              <span class="hidden md:block">Next</span>
+              <Icon
+                name="iconoir:arrow-right"
+                class="size-6 cursor-pointer md:hidden"
+              />
+            </Button>
+          )
+        }
+      </div>
+    </div>
+  </div>
+
+  <article
+    class="prose max-w-none rounded-2xl bg-gray-50 p-4 font-light dark:prose-invert dark:bg-gray-950 md:p-6"
+  >
+    <Content />
+  </article>
+</Layout>
+
+<!-- lite-youtube-embed - CSS imported in the server script tag above -->
+<script src="@/modules/lite-youtube-embed/src/lite-yt-embed.js"></script>

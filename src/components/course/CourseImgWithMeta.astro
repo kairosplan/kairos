@@ -1,0 +1,99 @@
+---
+import type { EnrichedCourse } from "@/interfaces/course.interface";
+import { colorMapping } from "@/utils/colorMapping";
+import { Icon } from "astro-icon/components";
+import { Image } from "astro:assets";
+
+interface Props {
+  enrichedCourse: EnrichedCourse;
+  imgWidth?: number;
+  imgHeight?: number;
+}
+
+const { enrichedCourse, imgWidth = 1280, imgHeight = 720 } = Astro.props;
+---
+
+<div class="group relative aspect-video overflow-hidden">
+  <Image
+    src={enrichedCourse.img}
+    alt={enrichedCourse.title}
+    height={imgHeight}
+    width={imgWidth}
+    class="h-full w-full rounded-2xl object-cover transition-all duration-300 group-hover:brightness-110"
+    transition:name={`img-${enrichedCourse.slug}`}
+  />
+  <span
+    class:list={[
+      "absolute left-2 top-2 z-10 flex max-w-fit items-center gap-0.5 rounded-full border px-2 py-0.5 text-xs font-medium",
+      colorMapping[enrichedCourse.category.color].text,
+      colorMapping[enrichedCourse.category.color].bg,
+      colorMapping[enrichedCourse.category.color].border,
+    ]}
+    transition:name={`category-${enrichedCourse.slug}`}
+  >
+    <span
+      class:list={[
+        "items-center gap-0.5 sm:flex",
+        imgWidth > 600 ? "flex" : "hidden",
+      ]}
+    >
+      {enrichedCourse.category.name}{" "}
+      <Icon name="iconoir:nav-arrow-right" class="size-3" />
+    </span>
+    {enrichedCourse.tag.name}
+  </span>
+  <div
+    class:list={[
+      "absolute bottom-2 left-2 flex items-center gap-1 rounded-full border bg-white/50 px-1 py-0.5",
+      enrichedCourse.level.id === "beginner",
+      {
+        "border-green-500": enrichedCourse.level.id === "beginner",
+        "border-orange-500": enrichedCourse.level.id === "intermediate",
+        "border-red-500": enrichedCourse.level.id === "advanced",
+      },
+    ]}
+    transition:name={`level-${enrichedCourse.slug}`}
+  >
+    <div class="flex gap-1">
+      <div
+        class:list={[
+          "h-2 w-2 rounded-full",
+          {
+            "bg-green-500": enrichedCourse.level.id === "beginner",
+            "bg-orange-500": enrichedCourse.level.id === "intermediate",
+            "bg-red-500": enrichedCourse.level.id === "advanced",
+          },
+        ]}
+      >
+      </div>
+      <div
+        class:list={[
+          "h-2 w-2 rounded-full",
+          {
+            "bg-orange-500": enrichedCourse.level.id === "intermediate",
+            "bg-red-500": enrichedCourse.level.id === "advanced",
+            "bg-gray-300":
+              enrichedCourse.level.id === "beginner" ||
+              enrichedCourse.level.id === "intermediate",
+          },
+        ]}
+      >
+      </div>
+      <div
+        class:list={[
+          "h-2 w-2 rounded-full",
+          {
+            "bg-red-500": enrichedCourse.level.id === "advanced",
+            "bg-gray-300": enrichedCourse.level.id !== "advanced",
+          },
+        ]}
+      >
+      </div>
+    </div>
+    <span
+      class="invisible absolute left-full ml-2 rounded-full bg-gray-900 px-2 py-0.5 text-xs text-white opacity-0 transition-all duration-200 group-hover:visible group-hover:opacity-100"
+    >
+      {enrichedCourse.level.name}
+    </span>
+  </div>
+</div>

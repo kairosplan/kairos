@@ -1,0 +1,24 @@
+<script is:inline>
+  // Set Dark/Light Theme
+  const setTheme = () => {
+    const userPreference = localStorage.getItem("theme");
+    const systemPreference = window.matchMedia("(prefers-color-scheme: dark)")
+      .matches
+      ? "dark"
+      : "light";
+
+    const theme = userPreference || systemPreference;
+
+    if (theme === "dark") {
+      document.documentElement.classList.add("dark");
+    } else {
+      document.documentElement.classList.remove("dark");
+    }
+  };
+
+  setTheme();
+
+  document.addEventListener("astro:after-swap", () => {
+    setTheme();
+  });
+</script>

@@ -1,0 +1,50 @@
+---
+import { Icon } from "astro-icon/components";
+---
+
+<button id="theme-toggle">
+  <Icon
+    name="iconoir:sun-light"
+    class="size-6 hover:text-orange-500 dark:hidden"
+  />
+  <Icon
+    name="iconoir:half-moon"
+    class="hidden size-6 hover:text-orange-500 dark:block"
+  />
+</button>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const $themeToggle = document.querySelector("#theme-toggle");
+
+    if ($themeToggle) {
+      // Get the saved preferences from localStorage
+      const userPreference = localStorage.getItem("theme");
+
+      // If there are no saved preferences, use the system preference
+      const systemPreference = window.matchMedia("(prefers-color-scheme: dark)")
+        .matches
+        ? "dark"
+        : "light";
+
+      // Determine the final theme
+      const theme = userPreference || systemPreference;
+
+      if (theme === "dark") {
+        document.documentElement.classList.add("dark");
+      }
+
+      $themeToggle.addEventListener("click", () => {
+        const isDark = document.documentElement.classList.contains("dark");
+
+        if (!isDark) {
+          document.documentElement.classList.add("dark");
+          localStorage.setItem("theme", "dark");
+        } else {
+          document.documentElement.classList.remove("dark");
+          localStorage.setItem("theme", "light");
+        }
+      });
+    }
+  });
+</script>

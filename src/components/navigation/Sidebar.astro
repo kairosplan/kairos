@@ -1,0 +1,75 @@
+---
+
+---
+
+<aside
+  id="sidebar"
+  class="fixed left-0 top-0 z-40 h-screen w-full -translate-x-full bg-gray-50 transition-transform duration-500 dark:bg-gray-950 md:static md:h-auto md:w-auto md:translate-x-0"
+  transition:name="sidebar"
+>
+  <div class="sticky overflow-x-hidden py-16 md:py-0">
+    <div
+      class="max-h-[calc(100vh-64px)] w-full min-w-60 overflow-y-auto p-6 md:max-h-full md:p-3"
+    >
+      <slot />
+    </div>
+  </div>
+</aside>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    const $sidebarToggle = document.querySelector("#sidebar-toggle");
+    if ($sidebarToggle) {
+      const $main = document.querySelector("#main") as HTMLElement;
+      const $sidebar = document.getElementById("sidebar") as HTMLElement;
+      $sidebarToggle.addEventListener("click", () => {
+        if (window.innerWidth < 768) {
+          $sidebar.classList.toggle("-translate-x-full");
+        } else {
+          $main?.classList.toggle("md:grid-cols-[240px,1fr]");
+          $main?.classList.toggle("md:grid-cols-[0px,1fr]");
+          // Set sidebar state in local storage
+          localStorage.setItem(
+            "kairos-sidebar-desktop",
+            $main?.classList.contains("md:grid-cols-[240px,1fr]")
+              ? "open"
+              : "closed",
+          );
+        }
+      });
+
+      document.addEventListener("click", (e) => {
+        if (
+          window.innerWidth < 768 &&
+          !$sidebar.classList.contains("-translate-x-full") &&
+          !$sidebar.contains(e.target as Node) &&
+          !$sidebarToggle?.contains(e.target as Node)
+        ) {
+          $sidebar.classList.add("-translate-x-full");
+        }
+      });
+    }
+  });
+
+  const updateMainClasses = () => {
+    const sidebarStateDesktop = localStorage.getItem("kairos-sidebar-desktop");
+
+    const $sidebar = document.getElementById("sidebar") as HTMLElement;
+    if ($sidebar) {
+      const $main = document.querySelector("#main") as HTMLElement;
+
+      if (sidebarStateDesktop === "closed") {
+        $main?.classList.remove("md:grid-cols-[240px,1fr]");
+        $main?.classList.add("md:grid-cols-[0px,1fr]");
+      }
+    }
+  };
+
+  document.addEventListener("astro:after-swap", () => {
+    const sidebarStateDesktop = localStorage.getItem("kairos-sidebar-desktop");
+
+    if (sidebarStateDesktop === "closed") {
+      updateMainClasses();
+    }
+  });
+</script>

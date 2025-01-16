@@ -1,0 +1,106 @@
+---
+import ClientRouter from "astro/components/ClientRouter.astro";
+import NavMain from "@/components/navigation/NavMain.astro";
+import Footer from "@/components/layout/Footer.astro";
+import SetTheme from "@/utils/SetTheme.astro";
+import Sidebar from "@/components/navigation/Sidebar.astro";
+
+import "@/assets/css/font.css";
+
+interface Props {
+  title?: string;
+  description?: string;
+  fullWidth?: boolean;
+  showNav?: boolean;
+  transparentNav?: boolean;
+  showFooter?: boolean;
+  showSidebar?: boolean;
+  mainGray?: boolean;
+}
+
+const {
+  title,
+  description = "Free, practical courses based on real projects. Transform curiosity into action, and impact the world through continuous learning. Join a passionate community where knowledge meets innovation.",
+  fullWidth = false,
+  showNav = true,
+  transparentNav = false,
+  showFooter = true,
+  showSidebar = false,
+  mainGray = false,
+} = Astro.props;
+
+const fullTitle = title
+  ? `${title} | Kairos`
+  : "Kairos | The time to grow is now.";
+
+const links = [{ label: "Courses", href: "/courses" }];
+---
+
+<!doctype html>
+<html lang="en">
+  <head>
+    <SetTheme />
+    <ClientRouter />
+    <meta charset="UTF-8" />
+    <meta name="description" content={description} />
+    <meta name="viewport" content="width=device-width" />
+    <link rel="icon" type="image/svg+xml" href="/favicon.svg" />
+    <title>{fullTitle}</title>
+  </head>
+
+  <body class="bg-gray-50 text-gray-950 dark:bg-gray-950 dark:text-gray-50">
+    {
+      showNav && (
+        <NavMain
+          showSidebar={showSidebar}
+          links={links}
+          transparent={transparentNav}
+        />
+      )
+    }
+    <main
+      id="main"
+      class:list={[
+        "grid gap-4",
+        !fullWidth && "container mx-auto",
+        showNav && !transparentNav && "mt-16",
+        showNav && showSidebar
+          ? "grid-cols-1 transition-[grid-template-columns] duration-500 md:grid-cols-[240px,1fr]"
+          : "grid-cols-1",
+      ]}
+    >
+      {
+        showNav && showSidebar && (
+          <Sidebar links={links}>
+            <slot name="sidebar" />
+          </Sidebar>
+        )
+      }
+      <div
+        class:list={[
+          mainGray && "rounded-2xl bg-white dark:bg-black",
+          !fullWidth && "p-3 md:p-5",
+        ]}
+        transition:name="main"
+      >
+        <slot />
+      </div>
+    </main>
+
+    {showFooter && <Footer />}
+  </body>
+</html>
+
+<style is:global>
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    text-wrap: balance;
+  }
+  p {
+    text-wrap: pretty;
+  }
+</style>

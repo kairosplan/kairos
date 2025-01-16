@@ -1,0 +1,73 @@
+---
+import { Icon } from "astro-icon/components";
+import type { EnrichedCourse } from "@/interfaces/course.interface";
+
+interface Props {
+  enrichedCourse: EnrichedCourse;
+}
+
+const { enrichedCourse } = Astro.props;
+---
+
+{
+  enrichedCourse.modules.map((module, moduleIndex) => {
+    const hasCurrentLesson = module.lessons.some((lesson) =>
+      Astro.url.pathname.includes(lesson.slug),
+    );
+    const hasAnyCurrentLesson = enrichedCourse.modules.some((m) =>
+      m.lessons.some((l) => Astro.url.pathname.includes(l.slug)),
+    );
+    return (
+      <section class="text-black dark:text-white">
+        <input
+          type="checkbox"
+          id={module.title}
+          class="peer hidden [&:checked~label_.icon]:rotate-180"
+          {...(hasCurrentLesson && { checked: true })}
+          {...(!hasAnyCurrentLesson && moduleIndex === 0 && { checked: true })}
+        />
+        <label
+          for={module.title}
+          class="module-header flex w-full cursor-pointer items-center justify-between py-2 text-left focus:outline-none"
+        >
+          <span>{module.title}</span>
+          <Icon
+            name="iconoir:nav-arrow-down"
+            class="icon size-5 shrink-0 transition-transform delay-100 duration-300"
+          />
+        </label>
+        <ul class="max-h-0 overflow-hidden transition-all duration-300 peer-checked:max-h-[1000px]">
+          {module.lessons.map((lesson) => {
+            const isCurrentLesson = Astro.url.pathname.endsWith(lesson.slug);
+            return (
+              <a href={`/courses/${lesson.slug}`} class="group">
+                <li class="flex items-center px-1 py-2">
+                  <div
+                    class:list={[
+                      "flex h-[22px] w-[22px] shrink-0 items-center justify-center rounded-full border text-xs transition-colors group-hover:border-orange-500 group-hover:text-orange-500",
+                      isCurrentLesson
+                        ? "border-orange-500 text-orange-500"
+                        : "text-gray-800 dark:text-gray-200",
+                    ]}
+                  >
+                    {lesson.index}
+                  </div>
+                  <span
+                    class:list={[
+                      "ml-2 text-sm group-hover:text-orange-500",
+                      isCurrentLesson
+                        ? "text-orange-500"
+                        : "text-gray-800 dark:text-gray-200",
+                    ]}
+                  >
+                    {lesson.title}
+                  </span>
+                </li>
+              </a>
+            );
+          })}
+        </ul>
+      </section>
+    );
+  })
+}

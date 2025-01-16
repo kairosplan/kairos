@@ -1,0 +1,202 @@
+---
+interface Props {
+  color?:
+    | "black"
+    | "white"
+    | "orange"
+    | "teal"
+    | "lime"
+    | "red"
+    | "green"
+    | "gray";
+  variant?: "solid" | "outline";
+  width?: "inline" | "full";
+  href?: string;
+  type?: "button" | "submit" | "reset";
+  size?: "sm" | "md" | "lg" | "xl";
+  className?: string;
+  [key: string]: any;
+}
+
+const {
+  color = "black",
+  variant = "solid",
+  width = "inline",
+  href,
+  type = "button",
+  size = "md",
+  className = "",
+  ...rest
+} = Astro.props;
+
+// Base classes
+const baseClasses = [
+  "inline-flex",
+  "justify-center",
+  "items-center",
+  "gap-x-1 sm:gap-x-2",
+  "rounded-full",
+  "border",
+  "focus:outline-none",
+  "disabled:opacity-50",
+  "disabled:pointer-events-none",
+  "disabled:cursor-not-allowed",
+  "transition-colors",
+  "duration-200",
+];
+
+// Size classes
+const sizeClasses = getSizeClasses(size);
+function getSizeClasses(size: "sm" | "md" | "lg" | "xl") {
+  switch (size) {
+    case "sm":
+      return "py-0.5 px-2.5 text-xs sm:py-1 sm:px-3 sm:text-sm";
+    case "md":
+      return "py-1 px-3 text-sm sm:py-2 sm:px-5 sm:text-base";
+    case "lg":
+      return "py-2 px-5 text-base sm:py-3 sm:px-7 sm:text-lg";
+    case "xl":
+      return "py-3 px-7 text-lg sm:py-4 sm:px-9 sm:text-xl";
+    default:
+      return "py-1 px-3 text-sm sm:py-2 sm:px-5 sm:text-base";
+  }
+}
+
+// Width class
+if (width === "full") {
+  baseClasses.push("w-full");
+}
+
+// Variant and color classes
+let variantClasses = [];
+if (variant === "solid") {
+  variantClasses.push("border-transparent");
+  variantClasses.push(getSolidClasses(color));
+} else if (variant === "outline") {
+  variantClasses.push("bg-transparent");
+  variantClasses.push(getOutlineClasses(color));
+}
+
+// Focus ring classes
+const focusRingClass = getFocusRingClasses(color);
+
+function getSolidClasses(
+  color:
+    | "black"
+    | "white"
+    | "orange"
+    | "teal"
+    | "lime"
+    | "red"
+    | "green"
+    | "gray",
+) {
+  switch (color) {
+    case "black":
+      return "bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100";
+    case "white":
+      return "bg-white text-black hover:bg-gray-100 dark:bg-black dark:text-white dark:hover:bg-gray-800";
+    case "orange":
+      return "bg-orange-500 text-white hover:bg-orange-600 dark:bg-orange-400 dark:hover:bg-orange-500";
+    case "teal":
+      return "bg-teal-500 text-white hover:bg-teal-600 dark:bg-teal-400 dark:hover:bg-teal-500";
+    case "lime":
+      return "bg-lime-500 text-black hover:bg-lime-600 dark:bg-lime-400 dark:hover:bg-lime-500";
+    case "red":
+      return "bg-red-600 text-white hover:bg-red-700 dark:bg-red-500 dark:hover:bg-red-600";
+    case "green":
+      return "bg-green-600 text-white hover:bg-green-700 dark:bg-green-500 dark:hover:bg-green-600";
+    case "gray":
+      return "bg-gray-100 dark:bg-gray-800 hover:bg-gray-200 dark:hover:bg-gray-700";
+    default:
+      return "bg-black text-white hover:bg-gray-800 dark:bg-white dark:text-black dark:hover:bg-gray-100";
+  }
+}
+
+function getOutlineClasses(
+  color:
+    | "black"
+    | "white"
+    | "orange"
+    | "teal"
+    | "lime"
+    | "red"
+    | "green"
+    | "gray",
+) {
+  switch (color) {
+    case "black":
+      return "border-black text-black hover:bg-black hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black";
+    case "white":
+      return "border-white text-white hover:bg-white hover:text-black dark:border-black dark:text-black dark:hover:bg-black dark:hover:text-white";
+    case "orange":
+      return "border-orange-500 text-orange-500 hover:bg-orange-500 hover:text-white dark:border-orange-400 dark:text-orange-400 dark:hover:bg-orange-400 dark:hover:text-white";
+    case "teal":
+      return "border-teal-500 text-teal-500 hover:bg-teal-500 hover:text-white dark:border-teal-400 dark:text-teal-400 dark:hover:bg-teal-400 dark:hover:text-white";
+    case "lime":
+      return "border-lime-500 text-lime-500 hover:bg-lime-500 hover:text-black dark:border-lime-400 dark:text-lime-400 dark:hover:bg-lime-400 dark:hover:text-black";
+    case "red":
+      return "border-red-600 text-red-600 hover:bg-red-600 hover:text-white dark:border-red-500 dark:text-red-500 dark:hover:bg-red-500 dark:hover:text-white";
+    case "green":
+      return "border-green-600 text-green-600 hover:bg-green-600 hover:text-white dark:border-green-500 dark:text-green-500 dark:hover:bg-green-500 dark:hover:text-white";
+    case "gray":
+      return "border-gray-500 text-gray-500 hover:bg-gray-500 hover:text-white dark:border-gray-400 dark:text-gray-400 dark:hover:bg-gray-400 dark:hover:text-white";
+    default:
+      return "border-black text-black hover:bg-black hover:text-white dark:border-white dark:text-white dark:hover:bg-white dark:hover:text-black";
+  }
+}
+
+function getFocusRingClasses(
+  color:
+    | "black"
+    | "white"
+    | "orange"
+    | "teal"
+    | "lime"
+    | "red"
+    | "green"
+    | "gray",
+) {
+  switch (color) {
+    case "black":
+      return "focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50";
+    case "white":
+      return "focus:ring-2 focus:ring-white/50 dark:focus:ring-black/50";
+    case "orange":
+      return "focus:ring-2 focus:ring-orange-500/50 dark:focus:ring-orange-400/50";
+    case "teal":
+      return "focus:ring-2 focus:ring-teal-500/50 dark:focus:ring-teal-400/50";
+    case "lime":
+      return "focus:ring-2 focus:ring-lime-500/50 dark:focus:ring-lime-400/50";
+    case "red":
+      return "focus:ring-2 focus:ring-red-600/50 dark:focus:ring-red-500/50";
+    case "green":
+      return "focus:ring-2 focus:ring-green-600/50 dark:focus:ring-green-500/50";
+    case "gray":
+      return "focus:ring-2 focus:ring-gray-500/50 dark:focus:ring-gray-400/50";
+    default:
+      return "focus:ring-2 focus:ring-black/50 dark:focus:ring-white/50";
+  }
+}
+
+// Combine classes
+const classes = [
+  ...baseClasses,
+  sizeClasses,
+  variantClasses.join(" "),
+  focusRingClass,
+  className,
+].join(" ");
+---
+
+{
+  href ? (
+    <a href={href} class={classes} {...rest}>
+      <slot />
+    </a>
+  ) : (
+    <button type={type} class={classes} {...rest}>
+      <slot />
+    </button>
+  )
+}

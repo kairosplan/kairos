@@ -1,0 +1,43 @@
+---
+import type { EnrichedCourse } from "@/interfaces/course.interface";
+import { getNextAndPreviousLesson } from "@/utils/courseHelpers";
+import CourseModules from "@/components/course/CourseModules.astro";
+
+interface Props {
+  enrichedCourse: EnrichedCourse;
+}
+
+const { enrichedCourse } = Astro.props;
+
+enrichedCourse.modules[0].lessons[0].slug;
+
+const pathAfterCourses = Astro.url.pathname.split("/courses/")[1];
+const lessonSlug = pathAfterCourses.includes("/")
+  ? pathAfterCourses
+  : enrichedCourse.modules[0].lessons[0].slug;
+
+const { currentLesson } = await getNextAndPreviousLesson(
+  enrichedCourse.slug,
+  lessonSlug,
+);
+const totalLessons = enrichedCourse.modules.at(-1)!.lessons.at(-1)!.index;
+const progress = (currentLesson?.index / totalLessons) * 100;
+---
+
+<aside slot="sidebar">
+  <span class="text-sm text-gray-600 dark:text-gray-400"> Course </span>
+  <a href={`/courses/${enrichedCourse.slug}`}>
+    <h2 class="mb-7 mt-2 font-serif text-xl font-black italic">
+      {enrichedCourse.title}
+    </h2>
+  </a>
+  <div class="mb-6 h-2 w-full rounded-full bg-gray-200 dark:bg-gray-800">
+    <div
+      class="h-full rounded-full bg-orange-500"
+      style={`width: ${progress}%`}
+    >
+    </div>
+  </div>
+
+  <CourseModules enrichedCourse={enrichedCourse} />
+</aside>

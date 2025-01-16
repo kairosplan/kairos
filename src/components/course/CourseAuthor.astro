@@ -1,0 +1,35 @@
+---
+import type { Image as ImageType } from "@/interfaces/course.interface";
+import { Image } from "astro:assets";
+interface Props {
+  size?: "sm" | "md" | "lg";
+  className?: string;
+  author: {
+    id: string;
+    img: ImageType;
+    name: string;
+  };
+}
+
+const { author, size = "md", className } = Astro.props;
+---
+
+<div class:list={["flex items-center gap-2", className]}>
+  <Image
+    src={author.img}
+    alt={author.name}
+    height={size === "sm" ? 24 : size === "md" ? 36 : 48}
+    width={size === "sm" ? 24 : size === "md" ? 36 : 48}
+    class="rounded-full"
+  />
+  <div class="flex flex-col">
+    <span class:list={[size === "lg" ? "text-base" : "text-sm"]}>
+      {author.name}
+    </span>
+    {
+      size === "lg" && (
+        <span class="text-sm text-gray-600 dark:text-gray-400">Instructor</span>
+      )
+    }
+  </div>
+</div>

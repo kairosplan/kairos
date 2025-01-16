@@ -1,0 +1,85 @@
+---
+import Logo from "@/assets/img/Logo.astro";
+import NavLinks from "@/components/navigation/NavLinks.astro";
+import ThemeToggle from "@/components/utils/ThemeToggle.astro";
+import { Icon } from "astro-icon/components";
+
+interface Props {
+  showSidebar: boolean;
+  transparent?: boolean;
+  links: {
+    label: string;
+    href: string;
+  }[];
+}
+
+const { showSidebar, links, transparent = false } = Astro.props;
+---
+
+<nav
+  id="navbar"
+  class:list={[
+    "fixed left-0 top-0 z-50 w-full",
+    transparent ? "bg-transparent" : "bg-gray-50 dark:bg-gray-950",
+  ]}
+  transition:name="nav"
+>
+  <div
+    id="navbar-inner"
+    class="container mx-auto flex items-center justify-between px-3 py-2"
+  >
+    <div class="flex items-center gap-4">
+      <Icon
+        id="sidebar-toggle"
+        name="iconoir:menu-scale"
+        class:list={[
+          "size-6 rotate-180 scale-x-[-1] cursor-pointer transition-colors hover:text-orange-500",
+          !showSidebar && "hidden",
+        ]}
+      />
+      <a href="/" transition:name="logo">
+        <Logo className="h-12 py-4" />
+      </a>
+    </div>
+    <div class="flex items-center gap-4">
+      <NavLinks links={links} />
+
+      <div class="h-4 w-px bg-gray-200 dark:bg-gray-800"></div>
+      <!-- <a href="/courses">
+        <Icon
+          name="iconoir:search"
+          class="size-6 cursor-pointer transition-colors hover:text-orange-500"
+        />
+      </a> -->
+      <ThemeToggle />
+    </div>
+  </div>
+</nav>
+
+<script>
+  document.addEventListener("astro:page-load", () => {
+    document.addEventListener("scroll", () => {
+      const $navbar = document.getElementById("navbar") as HTMLElement;
+      const $navbarInner = document.getElementById(
+        "navbar-inner",
+      ) as HTMLElement;
+      if ($navbar && $navbarInner && window.scrollY > 1) {
+        // Apply smaller padding, blur, and opacity
+        $navbar.classList.add(
+          "backdrop-blur-md",
+          "bg-opacity-70",
+          "dark:bg-opacity-70",
+        );
+        $navbarInner.classList.remove("py-2");
+      } else if ($navbar && $navbarInner) {
+        // Revert to original state
+        $navbar.classList.remove(
+          "backdrop-blur-md",
+          "bg-opacity-70",
+          "dark:bg-opacity-70",
+        );
+        $navbarInner.classList.add("py-2");
+      }
+    });
+  });
+</script>

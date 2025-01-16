@@ -1,0 +1,87 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { getCollection } from "astro:content";
+import { getEnrichedCourse } from "@/utils/courseHelpers";
+import Button from "@/components/common/button/Button.astro";
+import CourseAuthor from "@/components/course/CourseAuthor.astro";
+import CourseModules from "@/components/course/CourseModules.astro";
+import CourseImgWithMeta from "@/components/course/CourseImgWithMeta.astro";
+
+export async function getStaticPaths() {
+  const courses = await getCollection("course");
+  const publishedCourses = courses.filter(
+    (course) => course.data.published === true,
+  );
+
+  return publishedCourses.map((course) => ({
+    params: { course: course.slug },
+    props: { course },
+  }));
+}
+
+const { course } = Astro.props;
+
+const enrichedCourse = await getEnrichedCourse(course.slug);
+
+const { Content } = await course.render();
+---
+
+<Layout>
+  <section class="container mx-auto flex flex-col gap-8 md:flex-row">
+    <div class="flex w-full items-center md:w-1/2">
+      <CourseImgWithMeta
+        enrichedCourse={enrichedCourse}
+        imgWidth={1280}
+        imgHeight={720}
+      />
+    </div>
+    <div class="flex w-full flex-col justify-center gap-8 md:w-1/2">
+      <h1
+        class="px-2 font-serif text-4xl font-bold italic"
+        transition:name={`title-${enrichedCourse.slug}`}
+      >
+        {enrichedCourse.title}
+      </h1>
+      <div
+        class="flex items-center gap-2 px-2 text-sm text-gray-600 dark:text-gray-400"
+      >
+        <CourseAuthor author={enrichedCourse.authors[0]} size="sm" /> •
+        <span>
+          {
+            (enrichedCourse.updatedAt
+              ? enrichedCourse.updatedAt
+              : enrichedCourse.createdAt
+            ).toLocaleDateString("en-US", {
+              day: "numeric",
+              month: "short",
+              year: "numeric",
+            })
+          }
+        </span>
+      </div>
+      <p class="px-2 text-gray-900 dark:text-gray-100">
+        {enrichedCourse.description}
+      </p>
+      <Button
+        color="black"
+        size="md"
+        href={`/courses/${enrichedCourse.modules[0].lessons[0].slug}`}
+        className="font-bold uppercase no-underline hover:bg-orange-500 dark:hover:bg-orange-400"
+      >
+        Enroll in Course
+      </Button>
+    </div>
+  </section>
+
+  <div
+    class="my-8 h-auto rounded-3xl bg-white p-6 dark:bg-black md:my-12 md:p-10"
+  >
+    <CourseModules enrichedCourse={enrichedCourse} />
+  </div>
+
+  <article
+    class="prose mx-auto p-2 dark:prose-invert md:max-w-screen-sm xl:max-w-screen-lg"
+  >
+    <Content />
+  </article>
+</Layout>

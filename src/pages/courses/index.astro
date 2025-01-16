@@ -1,0 +1,50 @@
+---
+import Layout from "@/layouts/Layout.astro";
+import { Image } from "astro:assets";
+import { getCollection } from "astro:content";
+import { getEnrichedCourse } from "@/utils/courseHelpers";
+import CourseImgWithMeta from "@/components/course/CourseImgWithMeta.astro";
+const courses = await getCollection("course");
+const publishedCourses = courses.filter(
+  (course) => course.data.published === true,
+);
+const enrichedCourses = await Promise.all(
+  publishedCourses.map((course) => getEnrichedCourse(course.slug)),
+);
+---
+
+<Layout>
+  <ul class="grid grid-cols-2 gap-y-2 md:grid-cols-3 md:gap-y-4 xl:grid-cols-4">
+    {
+      enrichedCourses.map((course) => (
+        <a
+          href={`/courses/${course.slug}`}
+          class="group m-0 rounded-2xl p-2 transition-colors duration-300 hover:bg-white dark:hover:bg-black md:p-3"
+        >
+          <li>
+            <CourseImgWithMeta
+              enrichedCourse={course}
+              imgWidth={400}
+              imgHeight={200}
+            />
+            <div class="font- mt-2 flex items-center gap-2 font-medium md:mt-3">
+              <Image
+                src={course.authors[0].img}
+                alt={course.authors[0].name}
+                height={36}
+                width={36}
+                class="hidden rounded-full sm:block"
+              />
+              <h2
+                class="text-wrap text-base leading-tight md:leading-tight"
+                transition:name={`title-${course.slug}`}
+              >
+                {course.title}
+              </h2>
+            </div>
+          </li>
+        </a>
+      ))
+    }
+  </ul>
+</Layout>
